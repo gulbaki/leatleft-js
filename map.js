@@ -41,9 +41,22 @@ function zoomToMarker(e) {
     const clickedEl = e.target;
     const markerId = clickedEl.getAttribute("data-marker");
     const marker = fg.getLayer(markerId);
+    console.log(clickedEl)
     const getLatLong = marker.getLatLng();
     marker.setOpacity(1);
-    marker.bindPopup(getLatLong.toString()).openPopup();
+    var button = document.createElement("button");
+    button.innerText = "Delete";
+    button.id = markerId
+    button.addEventListener("click", function (e) {
+        const elementToDelete = document.getElementById(markerId);
+        map.removeLayer(marker)
+
+        elementToDelete.parentNode.removeChild(elementToDelete);
+        clickedEl.parentNode.removeChild(clickedEl);
+    });
+
+    document.body.appendChild(button);
+    marker.bindPopup(button).openPopup();
     map.panTo(getLatLong);
 }
 
@@ -119,8 +132,8 @@ function updateInfo() {
     const marker = L.marker([lat, lng]).addTo(fg);
 
     createSidebarElements(marker);
-
     const data = {
+        id: marker._leaflet_id,
         date: Date.now(),
         lat: lat,
         lng: lng,
