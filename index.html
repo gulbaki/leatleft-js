@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+        <style>
+           *,
+:after,
+:before {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html {
+  height: 100%;
+}
+
+body,
+html,
+#map {
+  width: 100%;
+  height: 100%;
+}
+
+body {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial,
+    sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+  min-height: 100%;
+  margin: 0;
+  padding: 0;
+  background-color: #f1f1f1;
+}
+
+.mapid {
+  min-height: 100%;
+}
+
+.flex {
+  display: flex;
+  flex-direction: row;
+}
+
+.mapid #map {
+  width: calc(100% - 20%);
+}
+
+#sidebar {
+  width: 20%;
+  background: #fff;
+}
+
+.sidebar-el {
+  padding: 5px 10px;
+  background: #fff;
+  cursor: pointer;
+}
+
+.sidebar-el:hover {
+  background: #f1f1f1;
+}
+
+        </style>
+</head>
+<body>
+
+<div class="flex mapid">
+    <div id="map"
+        class="leaflet-container leaflet-touch leaflet-fade-anim leaflet-grab leaflet-touch-drag leaflet-touch-zoom"
+        tabindex="0" style="position: relative;">
+ 
+       
+    </div>
+    <div id="sidebar">
+       
+    </div>
+</div>
+
+    <script src="./map.js">
+      
+    </script>
+</body>
+</html>
