@@ -61,3 +61,7 @@ DELETE `/api/locations/delete/:id`
 
 This endpoint delete  of one location.
 
+
+GET  `/api/locations/export`
+This endpoint export  location json type.
+
