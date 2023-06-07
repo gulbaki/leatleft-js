@@ -1,5 +1,5 @@
 
-const API_URL = "http://127.0.0.1:4001/api/"
+const API_URL = "https://sammcase.bakigul.com/api/"
 let config = {
     minZoom: 7,
     maxZoom: 18,
