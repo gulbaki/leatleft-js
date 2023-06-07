@@ -13,7 +13,7 @@ const deleteLocationsSchema = {
     additionalProperties: false,
     properties: {
       id: {
-        type: 'number'
+        type: 'string'
       }
     },
     required: ['id']

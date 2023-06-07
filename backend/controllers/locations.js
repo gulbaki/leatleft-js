@@ -1,3 +1,4 @@
+import { ObjectId } from 'mongodb';
 
 const getLocationsHandler = async function (req, reply) {
   const LocationTable = this.mongo.location.db.collection('locations')
@@ -13,7 +14,7 @@ const addLocationsHandler = async function (req, reply) {
   try {
     const location = await LocationTable.insert({ __id, geo, date })
 
-    reply.code(201).send({ Location: location._id })
+    reply.code(201).send({ id: location.insertedIds[0] })
   } catch (err) {
     reply.code(409).send({ err })
   }
@@ -23,9 +24,10 @@ const deleteLocationsHandler = async function (req, reply) {
   const LocationTable = this.mongo.location.db.collection('locations')
 
   try {
-    const location = await LocationTable.deleteOne({ __id: req.params.id })
+    const location = await LocationTable.deleteOne({ _id: new ObjectId(req.params.id) })
     reply.code(200).send({ Location: location._id })
   } catch (err) {
+    console.log(err)
     reply.code(500).send({ err })
   }
 }

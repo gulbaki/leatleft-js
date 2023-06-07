@@ -1,5 +1,6 @@
 
-const API_URL = "https://sammcase.bakigul.com/api/"
+//const API_URL = "https://sammcase.bakigul.com/api/"
+const API_URL = "http://127.0.0.1:4001/api/"
 let config = {
     minZoom: 7,
     maxZoom: 18,
@@ -9,6 +10,7 @@ const zoom = 18;
 const lat = 52.22977;
 const lng = 21.01178;
 
+
 const map = L.map("map", config).setView([lat, lng], zoom);
 
 L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -16,9 +18,24 @@ L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
         '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
 }).addTo(map);
 
-function createSidebarElements(layer) {
+L.Map.include({
+    getMarkerById: function (id) {
+        var marker = null;
+        this.eachLayer(function (layer) {
+            if (layer instanceof L.Marker) {
+                if (layer.options.id === id) {
+                    marker = layer;
+                }
+            }
+        });
+        return marker;
+    }
+});
+
+function createSidebarElements(layer, id = 0) {
+    console.log(layer)
     const sidebar = document.getElementById("sidebar");
-    const el = `<div class="sidebar-el" data-marker="${layer._leaflet_id}">${layer
+    const el = `<div class="sidebar-el" data-marker="${layer.options.id}">${layer
         .getLatLng()
         .toString()}</div>`;
 
@@ -33,8 +50,7 @@ function createSidebarElements(layer) {
 function zoomToMarker(e) {
     const clickedEl = e.target;
     const markerId = clickedEl.getAttribute("data-marker");
-    const marker = fg.getLayer(markerId);
-    console.log(clickedEl)
+    const marker = map.getMarkerById(markerId);
     const getLatLong = marker.getLatLng();
     marker.setOpacity(1);
     var button = document.createElement("button");
@@ -42,8 +58,9 @@ function zoomToMarker(e) {
     button.id = markerId
     button.addEventListener("click", async function (e) {
         const elementToDelete = document.getElementById(markerId);
+         console.log(markerId)
         map.removeLayer(marker)
-        await axios.delete(API_URL + "locations/delete/" + parseInt(markerId), {}).then(function (response) {
+        await axios.delete(API_URL + "locations/delete/" + markerId ).then(function (response) {
             console.log(response)
             // do whatever you want if console is [object object] then stringify the response
         })
@@ -62,7 +79,6 @@ const saveButtonControl = L.Control.extend({
     },
     onAdd: function (map) {
         const saveButton = L.DomUtil.create("button");
-        const dowloadsaveButton = L.DomUtil.create("button");
         saveButton.title = "Save";
         saveButton.textContent = "Save";
         saveButton.className = "save";
@@ -96,9 +112,8 @@ const exportButtonControl = L.Control.extend({
         const exportButton = L.DomUtil.create("a");
         exportButton.textContent = "export"
         exportButton.href = API_URL + "locations/export"
-         exportButton.title = "dowloand";
-        // exportButton.textContent = "dowloand";
-         exportButton.className = "dowloand";
+         exportButton.title = "export";
+         exportButton.className = "export";
         exportButton.setAttribute(
             "style",
             `
@@ -137,24 +152,27 @@ async function updateInfo() {
     markerPlace.innerHTML = `center: ${lat.toFixed(5)}, ${lng.toFixed(
         5
     )} | zoom: ${zoom}`;
-    const marker = L.marker([lat, lng]).addTo(fg);
 
-    createSidebarElements(marker);
     const data = {
-        __id: marker._leaflet_id,
+        __id:  Math.floor(Math.random() * 600) + 1,
         date: new Date().toISOString(),
         loc: [lat, lng]
     }
     await axios.post(API_URL + "locations/add", data).then(function (response) {
         console.log(response)
-        if(response.status == 200){
+        if(response.status == 201){
+            console.log()
+            const marker = L.marker([lat, lng], { id: response.data.id }).addTo(fg);
+        
+            createSidebarElements(marker);
+            marker.setOpacity(0);
             alert("success")
         }
         else {
             alert("failed")
         }
     })
-    marker.setOpacity(0);
+
 }
 
 
@@ -162,15 +180,18 @@ async function getAllmarker() {
     await axios.get(API_URL + "locations/get",).then(function (response) {
         const zoom = map.getZoom();
         if (response.status == 200) {
+            console.log(response.data)
             for (const el of response.data) {
                 const lat = el.geo.coordinates[0]
                 const lng = el.geo.coordinates[1]
-                console.log(el.geo.coordinates[0])
 
                 markerPlace.innerHTML = `center: ${lat.toFixed(5)}, ${lng.toFixed(
                     5
                 )} | zoom: ${zoom}`;
-                const marker = L.marker([lat, lng]).addTo(fg);
+                fg._leaflet_id = el.__id
+                const marker = new L.marker([lat, lng], { id: el._id}).addTo(map);
+                console.log()
+
                 createSidebarElements(marker);
             }
 
@@ -183,4 +204,5 @@ async function getAllmarker() {
 }
 getAllmarker();
 const fg = L.featureGroup().addTo(map);
+
 map.fitBounds(fg.getBounds());
