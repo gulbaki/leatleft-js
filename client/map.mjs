@@ -20,7 +20,7 @@ L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
 
 L.Map.include({
     getMarkerById: function (id) {
-        var marker = null;
+        let marker = null;
         this.eachLayer(function (layer) {
             if (layer instanceof L.Marker) {
                 if (layer.options.id === id) {
@@ -33,7 +33,6 @@ L.Map.include({
 });
 
 function createSidebarElements(layer, id = 0) {
-    console.log(layer)
     const sidebar = document.getElementById("sidebar");
     const el = `<div class="sidebar-el" data-marker="${layer.options.id}">${layer
         .getLatLng()
@@ -58,10 +57,11 @@ function zoomToMarker(e) {
     button.id = markerId
     button.addEventListener("click", async function (e) {
         const elementToDelete = document.getElementById(markerId);
-         console.log(markerId)
         map.removeLayer(marker)
         await axios.delete(API_URL + "locations/delete/" + markerId ).then(function (response) {
-            console.log(response)
+            if(response.status == 200)
+                alert("success delete")
+            else alert("not found or failed")
             // do whatever you want if console is [object object] then stringify the response
         })
         elementToDelete.parentNode.removeChild(elementToDelete);
@@ -159,9 +159,7 @@ async function updateInfo() {
         loc: [lat, lng]
     }
     await axios.post(API_URL + "locations/add", data).then(function (response) {
-        console.log(response)
         if(response.status == 201){
-            console.log()
             const marker = L.marker([lat, lng], { id: response.data.id }).addTo(fg);
         
             createSidebarElements(marker);
@@ -172,15 +170,12 @@ async function updateInfo() {
             alert("failed")
         }
     })
-
 }
 
-
 async function getAllmarker() {
-    await axios.get(API_URL + "locations/get",).then(function (response) {
+     axios.get(API_URL + "locations/get",).then(function (response) {
         const zoom = map.getZoom();
         if (response.status == 200) {
-            console.log(response.data)
             for (const el of response.data) {
                 const lat = el.geo.coordinates[0]
                 const lng = el.geo.coordinates[1]
@@ -190,7 +185,6 @@ async function getAllmarker() {
                 )} | zoom: ${zoom}`;
                 fg._leaflet_id = el.__id
                 const marker = new L.marker([lat, lng], { id: el._id}).addTo(map);
-                console.log()
 
                 createSidebarElements(marker);
             }
