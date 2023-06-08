@@ -1,6 +1,6 @@
 {
   "type": "module",
-  "name": "crawlerservice",
+  "name": "location service",
   "description": "This project was bootstrapped with Fastify-CLI.",
   "version": "1.0.0",
   "main": "app.js",
